@@ -5,6 +5,7 @@ import csv
 import io
 import tempfile
 import xlrd
+import re
 from odoo import fields, models
 from odoo.exceptions import ValidationError
 import datetime
@@ -25,11 +26,11 @@ class ImportPurchaseOrder(models.TransientModel):
         help="Automatically confirm the quotation")
     order_number = fields.Selection(
         selection=[('from_system', 'From System'),
-                   ('from_file', 'From File')],
+                ('from_file', 'From File')],
         string='Reference', default='from_file', help="reference")
     import_product_by = fields.Selection(
         selection=[('name', 'Name'), ('default_code', 'Internal Reference'),
-                   ('barcode', 'Barcode')],
+                ('barcode', 'Barcode')],
         default="name", string="Import order by", help="import product")
 
     def action_test_import_purchase_order(self):
@@ -68,39 +69,6 @@ class ImportPurchaseOrder(models.TransientModel):
         if not self.order_number:
             raise ValidationError("Order number reference must be selected.")
 
-        # Validating Date formats (Order Deadline and Receipt Date)
-        if self.file_type == 'csv':
-            for row in rows:
-                if 'Order Deadline' in row:
-                    try:
-                        datetime.datetime.strptime(row['Order Deadline'], '%m/%d/%Y')
-                    except ValueError:
-                        raise ValidationError(f"Invalid date format for 'Order Deadline' in row {rows.index(row)+1}. Expected format: mm/dd/yyyy.")
-                
-                if 'Receipt Date' in row:
-                    try:
-                        datetime.datetime.strptime(row['Receipt Date'], '%m/%d/%Y')
-                    except ValueError:
-                        raise ValidationError(f"Invalid date format for 'Receipt Date' in row {rows.index(row)+1}. Expected format: mm/dd/yyyy.")
-        elif self.file_type == 'xlsx':
-            workbook = xlrd.open_workbook(fp.name)
-            sheet = workbook.sheet_by_index(0)
-            for row_index in range(1, sheet.nrows):
-                row = sheet.row_values(row_index)  # list
-                headers = sheet.row_values(0)  # list
-                data = dict(zip(headers, row))
-                if 'Order Deadline' in data:
-                    try:
-                        datetime.datetime.strptime(data['Order Deadline'], '%m/%d/%Y')
-                    except ValueError:
-                        raise ValidationError(f"Invalid date format for 'Order Deadline' in row {row_index+1}. Expected format: mm/dd/yyyy.")
-                
-                if 'Receipt Date' in data:
-                    try:
-                        datetime.datetime.strptime(data['Receipt Date'], '%m/%d/%Y')
-                    except ValueError:
-                        raise ValidationError(f"Invalid date format for 'Receipt Date' in row {row_index+1}. Expected format: mm/dd/yyyy.")
-        
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -110,6 +78,7 @@ class ImportPurchaseOrder(models.TransientModel):
                 'sticky': False,
             }
         }
+
 
     def action_generate_template(self):
         """Genera una plantilla Excel para importar órdenes de compra"""
@@ -146,10 +115,40 @@ class ImportPurchaseOrder(models.TransientModel):
         for col, label in enumerate(field_labels):
             worksheet.write(0, col, label, header_format)
 
+        # Añadir una fila de ejemplo
+        example_data = [
+            "PO12345",               # Order Reference
+            "Proveedor A",           # Vendor
+            "V12345",                # Vendor Reference
+            "12/31/2024",            # Order Deadline
+            "01/15/2025",            # Receipt Date
+            "Juan Pérez",            # Purchase Representative
+            "Producto X",            # Product
+            "12345",                 # Internal Reference
+            "123456789012",          # Barcode
+            "Color: Rojo",           # Variant Values
+            "Descripción del Producto", # Description
+            "100",                   # Quantity
+            "Unidad",                # UoM
+            "50",                    # Unit Price
+            "01/30/2025",            # Delivery Date
+            "IVA 21%"                # Taxes
+        ]
+
+        # Escribir los datos de ejemplo en la segunda fila
+        for col, value in enumerate(example_data):
+            worksheet.write(1, col, value)
+
+        # Ajustar automáticamente el tamaño de las columnas para que todo el texto sea visible
+        for col in range(len(field_labels)):
+            column_width = max(len(field_labels[col]), max(len(str(example_data[col])) for example_data in [example_data]))
+            worksheet.set_column(col, col, column_width)
+
+        # Cerrar y preparar el archivo
         workbook.close()
         output.seek(0)
 
-        # Crear attachment
+        # Crear adjunto
         attachment = self.env['ir.attachment'].create({
             'name': 'purchase_order_import_template.xlsx',
             'type': 'binary',
@@ -162,7 +161,6 @@ class ImportPurchaseOrder(models.TransientModel):
             'url': f'/web/content/{attachment.id}?download=true',
             'target': 'self',
         }
-
     def action_import_purchase_order(self):
         """Creating purchase record using uploaded xl/csv files"""
         purchase_order = self.env['purchase.order']
@@ -351,7 +349,11 @@ class ImportPurchaseOrder(models.TransientModel):
                         'Unit Price']
                 if item.get('Taxes'):
                     tax_name = item['Taxes']
-                    tax_amount = (re.findall(r"(\d+)%", tax_name))[0]
+                    tax_amount = re.findall(r"(\d+)%", tax_name)
+                    if tax_amount:
+                        tax_amount = float(tax_amount[0])
+                    else:
+                        tax_amount = 0.0
                     tax = account_tax.search(
                         [('name', '=', tax_name),
                          ('type_tax_use', '=', 'purchase')], limit=1)
@@ -359,7 +361,7 @@ class ImportPurchaseOrder(models.TransientModel):
                         tax = account_tax.create({
                             'name': tax_name,
                             'type_tax_use': 'purchase',
-                            'amount': tax_amount if tax_amount else 0.0
+                            'amount': tax_amount
                         })
                     pro_vals['taxes_id'] = line_vals['taxes_id'] = [tax.id]
                 if item.get('Product'):
@@ -430,7 +432,7 @@ class ImportPurchaseOrder(models.TransientModel):
                                         "Values\" to filter the records."
                                         % (item['Product']))
                                 continue
-                    else:
+                    else:   
                         error_msg += row_not_import_msg + (
                             "\n\t❎Product name missing in file!")
                         continue

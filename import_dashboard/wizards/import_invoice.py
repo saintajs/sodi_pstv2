@@ -303,14 +303,40 @@ class ImportInvoice(models.TransientModel):
         worksheet = workbook.add_worksheet("Invoice Import Template")
 
         # Estilo para encabezado
-        header_format = workbook.add_format({'bold': True, 'bg_color': '#D9D9D9'})
+        header_format = workbook.add_format({'bold': True, 'bg_color': '#D9D9D9', 'align': 'center', 'valign': 'vcenter'})
+        
+        # Escribir encabezados en la primera fila
         for col, label in enumerate(field_labels):
             worksheet.write(0, col, label, header_format)
 
+        # Añadir una línea de ejemplo
+        example_data = [
+            "Empresa ABC",                # Socio
+            "2024-03-19 08:00:00",        # Fecha de Factura
+            "2024-04-19 08:00:00",        # Fecha de Vencimiento
+            "INV-12345",                  # Número
+            "Producto A",                 # Producto
+            "12345",                       # Código de Cuenta
+            "Unidad",                     # UoM
+            10.0,                          # Cantidad
+            100.0                          # Precio
+        ]
+
+        # Escribir los datos de ejemplo en la segunda fila
+        for col, value in enumerate(example_data):
+            worksheet.write(1, col, value)
+
+        # Ajustar automáticamente el tamaño de las columnas para que todo el texto sea visible
+        for col in range(len(field_labels)):
+            # Ajusta el ancho de las columnas al tamaño máximo entre el encabezado y los datos
+            column_width = max(len(field_labels[col]), max(len(str(example_data[col])) for example_data in [example_data]))
+            worksheet.set_column(col, col, column_width)
+
+        # Cerrar y preparar el archivo
         workbook.close()
         output.seek(0)
 
-        # Crear archivo adjunto en Odoo
+        # Crear adjunto en Odoo
         attachment = self.env['ir.attachment'].create({
             'name': 'invoice_import_template.xlsx',
             'type': 'binary',
@@ -318,7 +344,7 @@ class ImportInvoice(models.TransientModel):
             'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         })
 
-        # Retornar acción de descarga
+        # Retornar archivo para descarga
         return {
             'type': 'ir.actions.act_url',
             'url': f'/web/content/{attachment.id}?download=true',

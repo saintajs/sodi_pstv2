@@ -1,0 +1,335 @@
+// Estilos principales del contenedor
+.import-progress-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000; 
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+    background: url('/barra_migrada_prueba/static/src/img/nyancat_bckgr.gif');
+    background-repeat: repeat;
+    background-size: auto;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(0,0,0,0.1);
+    width: 650px;
+    height: 150px;
+    align-items: center;
+
+    .menu-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 25px;
+        height: 25px;
+        background: rgba(45, 118, 224, 0.95);
+        border-radius: 50%;
+        border: 2px solid white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        transition: all 0.3s ease;
+
+        &:hover {
+            background: rgba(30, 85, 165, 0.95);
+            transform: scale(1.1);
+        }
+
+        &::before {
+            content: "▼";
+            color: white;
+            font-size: 12px;
+        }
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 40px;
+        right: 0;
+        width: 120px;
+        background: rgba(45, 118, 224, 0.95);
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 10;
+        display: none;
+
+        &.show {
+            display: block;
+        }
+
+        .menu-item {
+            padding: 8px 10px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 12px;
+
+            &:hover {
+                background: rgba(30, 85, 165, 0.95);
+            }
+        }
+    }
+
+    .import-message {
+        font-size: 16px;
+        color: white;
+        text-align: center;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    .progress-bar {
+        position: relative;
+        width: 600px;
+        height: 40px;
+        background-color: rgba(45, 118, 224, 0.95);
+        border-radius: 20px;
+        overflow: hidden;
+        margin: 0 auto;
+    }
+
+    .progress {
+        height: 100%;
+        width: 0%;
+        border-radius: 20px 0 0 20px;
+        background-image: url('/barra_migrada_prueba/static/src/img/nyancat_rainbow.gif');
+        background-repeat: repeat-x;
+        background-size: auto 100%;
+        background-color: transparent;
+        background-blend-mode: multiply;
+        position: relative;
+        overflow: hidden;
+        animation: moveBackground 2s linear infinite;
+        transition: width 0.3s ease;
+    }
+
+    .nyan-cat {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 90px;
+        height: 40px;
+        pointer-events: none;
+        z-index: 20;
+        left: 0;
+        transition: left 0.3s ease;
+        background-color: transparent;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+
+    .progress-percentage {
+        text-align: center;
+        font-size: 14px;
+        color: white;
+        margin-top: 10px;
+        position: relative;
+        z-index: 5;
+        width: 100%;
+    }
+
+    // Estilos para la barra de progreso moderna
+    .progress-bar-modern {
+        position: relative;
+        width: 600px;
+        height: 40px;
+        background: #f0f0f0;
+        border: 1px solid #e0e0e0;
+        border-radius: 20px;
+        overflow: hidden;
+        margin: 0 auto;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        
+        .progress-modern {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #4a6cf7 0%, #a855f7 50%, #e91e63 100%);
+            background-size: 200% 100%;
+            animation: gradientShift 2s linear infinite;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 15px rgba(74, 108, 247, 0.3);
+        }
+        
+        .progress-status {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #333333;
+            font-weight: 600;
+            z-index: 10;
+            text-shadow: 0 0 2px rgba(255, 255, 255, 0.7);
+        }
+        
+        .progress-percentage-modern {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #333333;
+            font-weight: 600;
+            z-index: 10;
+            text-shadow: 0 0 2px rgba(255, 255, 255, 0.7);
+        }
+    }
+
+    .change-screen-message {
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+        margin: 20px 0;
+        width: 100%;
+    }
+}
+
+// Estilos para el contenedor del porcentaje estándar
+.standard-percentage-container {
+    display: none; // Oculto por defecto, se muestra cuando se selecciona la opción
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+    
+    &:not(.modern-style) {
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
+            opacity: 0.9;
+            z-index: 1;
+        }
+    }
+}
+
+.standard-percentage {
+    font-size: 4.5rem;
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+    position: relative;
+    animation: pulse 1.5s infinite alternate;
+    
+    &::after {
+        content: 'Cargando';
+        position: absolute;
+        bottom: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 1rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
+        letter-spacing: 1px;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+    100% {
+        transform: scale(1.05);
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+    }
+}
+
+// Asegurarse de que los estilos solo se apliquen cuando no hay otras clases activas
+.import-progress-container:not(.modern-style) {
+    &:not(.nyancat-style) {
+        .import-message {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #333;
+            font-weight: 600;
+            z-index: 2;
+        }
+        
+        .standard-percentage-container {
+            display: flex;
+        }
+    }
+}
+
+// Clase para el estilo moderno
+.modern-style {
+    background: #ffffff !important;
+    background-image: none !important;
+    
+    .import-message {
+        color: #000000; /* Cambiado de blanco a negro */
+    }
+    
+    .progress {
+        background-image: none !important;
+        background-color: #f0f0f0;
+        
+        .nyan-cat {
+            display: none !important;
+        }
+    }
+    
+    .progress-bar-modern {
+        display: block !important;
+    }
+    
+    .progress-percentage-modern {
+        color: #000000 !important; /* Asegurar que el porcentaje sea negro */
+    }
+}
+
+// Animaciones
+@keyframes moveBackground {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 100% 0;
+    }
+}
+
+@keyframes shine {
+    0% {
+        background-position: -40px 0;
+    }
+    100% {
+        background-position: 100px 0;
+    }
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}

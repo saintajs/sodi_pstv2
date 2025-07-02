@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="barra_migrada_prueba.LoadingIndicator">
+        <div class="o_loading" t-att-class="{ 'o_loading_active': state.show, 'modern-theme': state.theme === 'modern', 'standard-theme': state.theme === 'standard' }">
+            <div class="loading-container">
+                <!-- Menú de estilos -->
+                <div class="style-menu">
+                    <div class="menu-button" t-on-click="() => this.toggleMenu()">
+                        <i class="fa fa-paint-brush"/>
+                    </div>
+                    <div class="dropdown-menu" t-att-class="{ 'show': state.menuOpen }">
+                        <div class="menu-item" t-on-click="() => this.changeTheme('standard')">
+                            <i class="fa fa-percent"/> Estándar
+                        </div>
+                        <div class="menu-item" t-on-click="() => this.changeTheme('nyancat')">
+                            <i class="fa fa-paw"/> Nyancat
+                        </div>
+                        <div class="menu-item" t-on-click="() => this.changeTheme('modern')">
+                            <i class="fa fa-star"/> Moderno
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="import-message">
+                    <t t-esc="state.message || 'Cargando, por favor espere...'"/>
+                    <t t-if="env.debug" class="request-count" t-esc="' (' + state.count + ')'" />
+                </div>
+                
+                <!-- Barra de progreso Nyancat -->
+                <t t-if="state.theme === 'nyancat'">
+                    <div class="progress-bar">
+                        <!-- Fondo blanco -->
+                        <div class="progress-bg"></div>
+                        <!-- Barra de arcoíris con patrón repetitivo -->
+                        <div class="rainbow-bar" t-att-style="'width: ' + state.progress + '%'">
+                            <div class="rainbow-pattern"></div>
+                        </div>
+                        <!-- Gato Nyancat -->
+                        <img t-att-src="'/barra_migrada_prueba/static/src/img/nyanimated.gif'" class="nyan-cat"/>
+                        <!-- Porcentaje -->
+                        <div class="progress-percentage" t-esc="Math.round(state.progress) + '%'"></div>
+                    </div>
+                </t>
+
+                <!-- Barra de progreso Estándar -->
+                <t t-elif="state.theme === 'standard'">
+                    <div class="progress-bar">
+                        <div class="rainbow-bar" t-att-style="'width: ' + state.progress + '%'">
+                            <!-- Efecto de brillo se agrega vía CSS -->
+                        </div>
+                        <div class="progress-percent" t-esc="Math.round(state.progress) + '%'"></div>
+                    </div>
+                </t>
+
+                <!-- Barra de progreso Moderna -->
+                <t t-elif="state.theme === 'modern'">
+                    <div class="progress-bar-modern">
+                        <div class="progress-modern" t-att-style="'width: ' + state.progress + '%'">
+                            <div class="progress-text" t-esc="Math.round(state.progress) + '%'"></div>
+                        </div>
+                    </div>
+                </t>
+
+                <!-- Contador de tiempo estimado -->
+                <div class="time-estimate" t-if="state.estimatedTime">
+                    Tiempo restante: <span t-esc="state.estimatedTime"></span>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,4 +1,4 @@
-// Estilos principales del contenedor
+    // Estilos principales del contenedor
 .import-progress-container {
     position: fixed;
     top: 50%;
@@ -8,17 +8,19 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 15px;
+    padding: 20px 30px;
     background: url('/barra_migrada_prueba/static/src/img/nyancat_bckgr.gif');
     background-repeat: repeat;
     background-size: auto;
-    border-radius: 5px;
+    border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     backdrop-filter: blur(5px);
     border: 1px solid rgba(0,0,0,0.1);
-    width: 650px;
-    height: 150px;
+    min-width: 650px;
+    width: auto;
+    height: auto;
     align-items: center;
+    box-sizing: border-box;
 
     .menu-button {
         position: absolute;
@@ -87,11 +89,13 @@
     .progress-bar {
         position: relative;
         width: 600px;
+        min-width: 600px;
         height: 40px;
         background-color: rgba(45, 118, 224, 0.95);
         border-radius: 20px;
         overflow: hidden;
         margin: 0 auto;
+        flex-shrink: 0;
     }
 
     .progress {
@@ -107,6 +111,11 @@
         overflow: hidden;
         animation: moveBackground 2s linear infinite;
         transition: width 0.3s ease;
+        opacity: 1 !important;
+
+        &.completed {
+            width: 100% !important;
+        }
     }
 
     .nyan-cat {
@@ -118,10 +127,15 @@
         pointer-events: none;
         z-index: 20;
         left: 0;
-        transition: left 0.3s ease;
+        transition: left 0.3s ease, opacity 1s ease 0.5s;
         background-color: transparent;
         image-rendering: -webkit-optimize-contrast;
         image-rendering: crisp-edges;
+        opacity: 1;
+
+        &.completed {
+            opacity: 0;
+        }
     }
 
     .progress-percentage {
@@ -136,8 +150,10 @@
 
     // Estilos para la barra de progreso moderna
     .progress-bar-modern {
+        display: none;
         position: relative;
-        width: 600px;
+        width: 100%;
+        max-width: 600px;
         height: 40px;
         background: #f0f0f0;
         border: 1px solid #e0e0e0;
@@ -158,6 +174,24 @@
             animation: gradientShift 2s linear infinite;
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 0 15px rgba(74, 108, 247, 0.3);
+            position: relative;
+            overflow: hidden;
+            
+            &::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 50%;
+                height: 100%;
+                background: linear-gradient(
+                    to right,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 255, 255, 0.3) 50%,
+                    rgba(255, 255, 255, 0) 100%
+                );
+                animation: shine 2s infinite;
+            }
         }
         
         .progress-status {
@@ -192,6 +226,48 @@
         text-align: center;
         margin: 20px 0;
         width: 100%;
+    }
+
+    // Estilos para el tiempo estimado
+    .time-remaining {
+        text-align: center;
+        font-size: 12px;
+        color: white;
+        margin-top: 5px;
+        width: 100%;
+        font-weight: 500;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .file-counter {
+        margin-top: 10px;
+        margin-bottom: 5px;
+        font-size: 14px !important;
+        font-weight: bold !important;
+        color: #666;
+        text-align: center;
+        width: 100%;
+    }
+}
+
+// Asegurar que el tiempo sea visible en el tema moderno
+.modern-style {
+    .time-remaining {
+        color: #333 !important;
+        text-shadow: none;
+    }
+}
+
+// Estilo para el contenedor estándar
+.standard-percentage-container {
+    .time-remaining {
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        color: white !important;
+        font-size: 14px;
+        z-index: 2;
     }
 }
 
@@ -282,7 +358,9 @@
     background-image: none !important;
     
     .import-message {
-        color: #000000; /* Cambiado de blanco a negro */
+        color: #000000;
+        margin-bottom: 15px;
+        font-weight: 600;
     }
     
     .progress {
@@ -296,10 +374,64 @@
     
     .progress-bar-modern {
         display: block !important;
+        width: 100%;
+        max-width: 600px;
+        height: 40px;
+        margin: 10px auto;
     }
     
     .progress-percentage-modern {
-        color: #000000 !important; /* Asegurar que el porcentaje sea negro */
+        color: #000000 !important;
+    }
+    
+    .modern-progress {
+        width: 100%;
+        max-width: 600px;
+        height: 40px;
+        background-color: #f0f0f0;
+        border-radius: 20px;
+        overflow: hidden;
+        margin: 10px auto;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e0e0e0;
+        
+        .modern-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4a6cf7 0%, #a855f7 50%, #e91e63 100%);
+            background-size: 200% 100%;
+            animation: gradientShift 2s linear infinite;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(74, 108, 247, 0.3);
+            
+            &::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 50%;
+                height: 100%;
+                background: linear-gradient(
+                    to right,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 255, 255, 0.3) 50%,
+                    rgba(255, 255, 255, 0) 100%
+                );
+                animation: shine 2s infinite;
+            }
+        }
+    }
+    
+    .modern-percentage {
+        text-align: center;
+        margin-top: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #4a6cf7;
+        transition: color 0.3s ease;
     }
 }
 
@@ -313,15 +445,6 @@
     }
 }
 
-@keyframes shine {
-    0% {
-        background-position: -40px 0;
-    }
-    100% {
-        background-position: 100px 0;
-    }
-}
-
 @keyframes gradientShift {
     0% {
         background-position: 0% 50%;
@@ -331,5 +454,11 @@
     }
     100% {
         background-position: 0% 50%;
+    }
+}
+
+@keyframes shine {
+    to {
+        transform: translateX(300%);
     }
 }

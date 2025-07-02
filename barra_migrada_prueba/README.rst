@@ -1,12 +1,13 @@
 License: LGPL-3
 
-Web Progress Sunni
+Web Progress 
 ==================
 Módulo para Odoo 17 que mejora la experiencia de importación de datos mostrando una barra de progreso visual con múltiples estilos (Estándar, Nyancat y Moderno) durante la carga y procesamiento de archivos.
 
 Características
 --------------
-* Muestra una barra de progreso visual durante la importación de datos
+* Muestra una barra de progreso visual durante la subida de archivos y la importacion de datos
+* Muestra una barra de progreso en toda accion que tenga cierto tiempo de carga 
 * Tres estilos diferentes de barras de progreso:
   * **Estándar**: Muestra solo el porcentaje de progreso
   * **Nyancat**: Barra de progreso animada con el gato de Nyan
@@ -62,7 +63,7 @@ Mantenedor
 
 Este módulo es mantenido por Anderson Chasiloa.
 
-Para soporte y más información, visite `Mi perfil de GitHub <https://github.com/ajchasiloa>`__
+Para soporte y más información, visite `<https://github.com/ajchasiloa>`__
 
 Información adicional
 ====================
